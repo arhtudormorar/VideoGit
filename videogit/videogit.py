@@ -15,7 +15,15 @@ import shutil
 
 class videogit:
     def setup_silicon_command(self):
-        self.silicon_command = f"silicon {self.temp_location}/temp_code.txt --no-line-number --output {self.temp_location}";
+        # Use custom title if provided, otherwise use file path
+        title_placeholder = "{custom_title}" if self.custom_title else "{file_path}"
+        
+        if self.show_line_numbers:
+            # When line numbers are enabled, use line offset to account for padding
+            # Based on testing, there's a +3 offset, so we use line-offset 4 to compensate
+            self.silicon_command = f"silicon {self.temp_location}/temp_code.txt --line-offset 0 --theme \"Visual Studio Dark+\" --window-title \"{title_placeholder}\" --output {self.temp_location}";
+        else:
+            self.silicon_command = f"silicon {self.temp_location}/temp_code.txt --no-line-number --theme \"Visual Studio Dark+\" --window-title \"{title_placeholder}\" --output {self.temp_location}";
 
     def setup_temp_path(self):
         self.temp_dir_object = tempfile.TemporaryDirectory();
@@ -61,6 +69,8 @@ class videogit:
         parser.add_argument('-u','--up-down-space', type=int, default="20", help='how many lines above and below the current editing line to include in the video')
         parser.add_argument('-m','--max_line_length', type=int, default="200", help='the maximum line length in chars before wrapping the text')
         parser.add_argument('-v', '--verbose', default=False, action='store_true', help='print any errors or logging information');
+        parser.add_argument('--show-line-numbers', action='store_true', help='show line numbers in the output video');
+        parser.add_argument('--title', type=str, help='custom title to display in the window (default: file path)');
 
         args = parser.parse_args()
 
@@ -72,6 +82,8 @@ class videogit:
         self.up_down_space = args.up_down_space;
         self.files = args.files;
         self.verbose = args.verbose;
+        self.show_line_numbers = args.show_line_numbers;
+        self.custom_title = args.title;
 
         commit1 = args.inital_commit.strip();
         commit2 = args.final_commit.strip();
@@ -347,7 +359,14 @@ class videogit:
         extension =  file_name.split(".")[-1]; # get the file extension
         with open(f"{self.temp_location}/temp_code.txt", "w") as text_file:
             print(code, file=text_file, end="")
-        self.run_system_command(f"{self.silicon_command}/{file_name}{index_of_image}.png --language {extension}"); # make master copy
+        
+        # Replace the title placeholder with custom title or file path
+        if self.custom_title:
+            silicon_command_with_title = self.silicon_command.replace("{custom_title}", self.custom_title)
+        else:
+            silicon_command_with_title = self.silicon_command.replace("{file_path}", file_name)
+        
+        self.run_system_command(f"{silicon_command_with_title}/{file_name}{index_of_image}.png --language {extension}"); # make master copy
 
 
         # for i in range(0, number_of_copies): #copy it as many times as needed

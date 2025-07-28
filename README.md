@@ -18,6 +18,8 @@
  
 - `videogit 5f7198d a06dcff -o output-dir` 
 
+- `videogit 5baaac53561796cd69b0ac71112f1105f4005375 -w 60 -r 24 -f tests/video01.spec.ts --show-line-numbers --title "tests > video01.ts"`
+
   Creates a video from commit 5f7198d to commit a06dcff, for all files changed over that period, and outputs the videos to `output-dir`
 ## Example Videos
 [![Video Git Demo](https://img.youtube.com/vi/872y0LlQmGg/0.jpg)](https://www.youtube.com/watch?v=872y0LlQmGg)
