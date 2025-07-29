@@ -71,6 +71,7 @@ class videogit:
         parser.add_argument('-v', '--verbose', default=False, action='store_true', help='print any errors or logging information');
         parser.add_argument('--show-line-numbers', action='store_true', help='show line numbers in the output video');
         parser.add_argument('--title', type=str, help='custom title to display in the window (default: file path)');
+        parser.add_argument('--output-filename', type=str, help='custom prefix for the output video filename (replaces the commit hash part, default: {commit1}--{commit2}--)');
 
         args = parser.parse_args()
 
@@ -84,11 +85,12 @@ class videogit:
         self.verbose = args.verbose;
         self.show_line_numbers = args.show_line_numbers;
         self.custom_title = args.title;
+        self.custom_output_filename = args.output_filename;
 
         commit1 = args.inital_commit.strip();
         commit2 = args.final_commit.strip();
 
-        if args.git_repo_directory is not "current directory":
+        if args.git_repo_directory != "current directory":
             self.run_system_command(f"cd {args.git_repo_directory}");
             os.chdir(args.git_repo_directory)
             
@@ -170,12 +172,19 @@ class videogit:
         for file_path in file_paths: 
             file_name = file_path.split("/")[len(file_path.split("/")) - 1] # remove the directory like /gg/gg/g and just get the last part
             completed_code_buffer = [];
-            prefile_text = f"{all_commits[0]}--{all_commits[-1]}--";
+            
+            # Use custom output filename prefix if provided, otherwise use the default commit hash format
+            if self.custom_output_filename:
+                filename_prefix = self.custom_output_filename + "--"
+            else:
+                filename_prefix = f"{all_commits[0]}--{all_commits[-1]}--";
+            
+            output_filename = filename_prefix + file_name;
 
             for i, commit in enumerate(all_commits[:-1]):
                 try:
                     diff_of_file = self.run_system_command(f"git diff -U999999 {commit}..{all_commits[i+1]} -- {file_path}") # the -U is to make sure we get the entire file
-                    completed_code_buffer += self.handle_file_diffs(diff_of_file, prefile_text + file_name)
+                    completed_code_buffer += self.handle_file_diffs(diff_of_file, output_filename)
                 except Exception as e:
                     cprint("Failed to open file: " + file_path, "red");
                     if self.verbose:
@@ -183,7 +192,7 @@ class videogit:
                     continue;
 
             try:
-                self.convert_completed_code_to_video(completed_code_buffer, prefile_text + file_name, file_name);
+                self.convert_completed_code_to_video(completed_code_buffer, output_filename, file_name);
             except KeyboardInterrupt:
                 print("\n");
                 sys.exit(0);

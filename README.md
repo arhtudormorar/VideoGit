@@ -21,6 +21,10 @@
 - `videogit 5baaac53561796cd69b0ac71112f1105f4005375 -w 60 -r 24 -f tests/video01.spec.ts --show-line-numbers --title "tests > video01.ts"`
 
   Creates a video from commit 5f7198d to commit a06dcff, for all files changed over that period, and outputs the videos to `output-dir`
+
+- `videogit $(git log --grep="^01" --pretty=format:"%h" -n 1) $(git log --grep="^02" --pretty=format:"%h" -n 1) -w 180 -r 24 -f tailwind.config.js --show-line-numbers --title "tailwind.config.js" --output-filename 01_video`
+
+  Creates a video from the first commit with message starting "01" to the first commit with message starting "02", with custom output filename `01_video--tailwind.config.js.mp4`
 ## Example Videos
 [![Video Git Demo](https://img.youtube.com/vi/872y0LlQmGg/0.jpg)](https://www.youtube.com/watch?v=872y0LlQmGg)
 
@@ -28,50 +32,49 @@
 ```
                             -------- VideoGit --------                          
 
-usage: videogit.py [-h] [-l] [-f FILES [FILES ...]] [-d GIT_REPO_DIRECTORY]
-                   [-w WPM] [-r FRAME_RATE] [-o OUTPUT_DIR] [-u UP_DOWN_SPACE]
-                   [-m MAX_LINE_LENGTH] [-v]
-                   inital_commit [final_commit]
+usage: videogit [-h] [-l] [-f FILES [FILES ...]] [-d GIT_REPO_DIRECTORY] [-w WPM] [-r FRAME_RATE] [-o OUTPUT_DIR]
+                [-u UP_DOWN_SPACE] [-m MAX_LINE_LENGTH] [-v] [--show-line-numbers] [--title TITLE]
+                [--output-filename OUTPUT_FILENAME]
+                inital_commit [final_commit]
 
-VideoGit by shahanneda (shahan.ca): Converts git commits, to a
-beautiful animated video. To get started type videogit -l,
+VideoGit by shahanneda (shahan.ca): Converts git commits, to a beautiful animated video. To get started
+type videogit -l,
 
 positional arguments:
   inital_commit         the hash of the commit to start the video at
-  final_commit          the hash of the commit to end the video at, if not
-                        specified will use the HEAD (default: the most recent
-                        commit)
+  final_commit          the hash of the commit to end the video at, if not specified will use the HEAD (default:
+                        the most recent commit)
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -l, --list-git-commits
                         list your recent commits and hashes (default: None)
-  -f FILES [FILES ...], --files FILES [FILES ...]
-                        a list of specific files to make the video, if not set
-                        will try to to make the video for all changed files,
-                        example: videogit <hash> -f file1.cpp
-                        file2.cpp) (default: None)
-  -d GIT_REPO_DIRECTORY, --git-repo-directory GIT_REPO_DIRECTORY
-                        the repo of your project, only needs to be set if it
-                        is diffrent than the current working directory
-                        (default: current directory)
-  -w WPM, --wpm WPM     the speed of the video in words per minute (default:
-                        480)
-  -r FRAME_RATE, --frame-rate FRAME_RATE
+  -f, --files FILES [FILES ...]
+                        a list of specific files to make the video, if not set will try to to make the video for
+                        all changed files, example: videogit <hash> -f file1.cpp file2.cpp) (default: None)
+  -d, --git-repo-directory GIT_REPO_DIRECTORY
+                        the repo of your project, only needs to be set if it is diffrent than the current working
+                        directory (default: current directory)
+  -w, --wpm WPM         the speed of the video in words per minute (default: 480)
+  -r, --frame-rate FRAME_RATE
                         the framerate of the output video (default: 30)
-  -o OUTPUT_DIR, --output-dir OUTPUT_DIR
-                        the directory of the output videos (default: current
-                        directory)
-  -u UP_DOWN_SPACE, --up-down-space UP_DOWN_SPACE
-                        how many lines above and below the current editing
-                        line to include in the video (default: 20)
-  -m MAX_LINE_LENGTH, --max_line_length MAX_LINE_LENGTH
-                        the maximum line length in chars before wrapping the
-                        text (default: 200)
-  -v, --verbose         print any errors or logging information (default:
-                        False)
+  -o, --output-dir OUTPUT_DIR
+                        the directory of the output videos (default: current directory)
+  -u, --up-down-space UP_DOWN_SPACE
+                        how many lines above and below the current editing line to include in the video (default: 20)
+  -m, --max_line_length MAX_LINE_LENGTH
+                        the maximum line length in chars before wrapping the text (default: 200)
+  -v, --verbose         print any errors or logging information (default: False)
+  --show-line-numbers   show line numbers in the output video (default: False)
+  --title TITLE         custom title to display in the window (default: file path) (default: None)
+  --output-filename OUTPUT_FILENAME
+                        custom prefix for the output video filename (replaces the commit hash part, default:
+                        {commit1}--{commit2}--) (default: None)
 ```
 
+## Local installation
+1. `pipx uninstall videogit`
+2. `pipx install -e .`
 
 ## Contributing
 Feel free to make any pull requests with new features or fixes.
